@@ -1,4 +1,10 @@
-const { calculate, main } = require('../calculator');
+const {
+  calculate,
+  main,
+  modulo,
+  power,
+  squareRoot,
+} = require('../calculator');
 
 describe('calculate', () => {
   describe('addition', () => {
@@ -67,9 +73,82 @@ describe('calculate', () => {
     });
   });
 
+  describe('modulo', () => {
+    test('calculates the image example: 5 % 2', () => {
+      expect(modulo(5, 2)).toBe(1);
+      expect(calculate('%', [5, 2])).toBe(1);
+      expect(main(['modulo', '5', '2'])).toBe(1);
+    });
+
+    test('supports negative dividends and exact divisions', () => {
+      expect(modulo(-5, 2)).toBe(-1);
+      expect(modulo(8, 4)).toBe(0);
+    });
+
+    test('rejects modulo by zero', () => {
+      expect(() => modulo(5, 0)).toThrow('Modulo by zero is not allowed.');
+      expect(() => calculate('%', [5, 0])).toThrow(
+        'Modulo by zero is not allowed.',
+      );
+    });
+
+    test('requires exactly two operands', () => {
+      expect(() => calculate('modulo', [10, 3, 1])).toThrow(
+        'Modulo requires exactly two operands.',
+      );
+    });
+  });
+
+  describe('power', () => {
+    test('calculates the image example: 2 ^ 3', () => {
+      expect(power(2, 3)).toBe(8);
+      expect(calculate('^', [2, 3])).toBe(8);
+      expect(main(['power', '2', '3'])).toBe(8);
+    });
+
+    test('supports zero and negative exponents', () => {
+      expect(power(5, 0)).toBe(1);
+      expect(power(2, -2)).toBe(0.25);
+    });
+
+    test('requires exactly two operands', () => {
+      expect(() => calculate('power', [2, 3, 4])).toThrow(
+        'Power requires exactly two operands.',
+      );
+    });
+  });
+
+  describe('square root', () => {
+    test('calculates the image example: square root of 16', () => {
+      expect(squareRoot(16)).toBe(4);
+      expect(calculate('sqrt', [16])).toBe(4);
+      expect(main(['sqrt', '16'])).toBe(4);
+    });
+
+    test('supports zero and decimal values', () => {
+      expect(squareRoot(0)).toBe(0);
+      expect(squareRoot(0.25)).toBe(0.5);
+    });
+
+    test('rejects negative numbers', () => {
+      expect(() => squareRoot(-1)).toThrow(
+        'Square root of a negative number is not allowed.',
+      );
+      expect(() => calculate('sqrt', [-16])).toThrow(
+        'Square root of a negative number is not allowed.',
+      );
+    });
+
+    test('requires exactly one operand', () => {
+      expect(() => calculate('sqrt', [9, 16])).toThrow(
+        'Square root requires exactly one operand.',
+      );
+    });
+  });
+
   test('rejects unsupported operations', () => {
-    expect(() => calculate('power', [2, 3])).toThrow(
-      'Unsupported operation. Use add, subtract, multiply, or divide.',
+    expect(() => calculate('log', [2, 3])).toThrow(
+      'Unsupported operation. Use add, subtract, multiply, divide, modulo, power, or squareRoot.',
     );
   });
 
@@ -93,7 +172,7 @@ describe('main', () => {
 
   test('rejects incomplete CLI arguments', () => {
     expect(() => main(['add', '2'])).toThrow(
-      'Usage: node src/calculator.js <operation> <number> [number...]',
+      'At least two operands are required.',
     );
   });
 });

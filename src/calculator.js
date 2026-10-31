@@ -8,6 +8,9 @@
  * - subtraction (- or subtract)
  * - multiplication (* or multiply)
  * - division (/ or divide)
+ * - modulo (% or modulo)
+ * - exponentiation (^, power, or exponentiate)
+ * - square root (sqrt or squareRoot)
  *
  * Usage:
  *   node src/calculator.js <operation> <number> [number...]
@@ -22,7 +25,32 @@ const operationAliases = {
   multiply: 'multiply',
   '/': 'divide',
   divide: 'divide',
+  '%': 'modulo',
+  modulo: 'modulo',
+  '^': 'power',
+  power: 'power',
+  exponentiate: 'power',
+  sqrt: 'squareRoot',
+  squareroot: 'squareRoot',
 };
+
+function modulo(a, b) {
+  if (b === 0) {
+    throw new Error('Modulo by zero is not allowed.');
+  }
+  return a % b;
+}
+
+function power(base, exponent) {
+  return base ** exponent;
+}
+
+function squareRoot(n) {
+  if (n < 0) {
+    throw new Error('Square root of a negative number is not allowed.');
+  }
+  return Math.sqrt(n);
+}
 
 function parseNumbers(values) {
   const numbers = values.map(Number);
@@ -39,11 +67,15 @@ function calculate(operation, operands) {
 
   if (!normalizedOperation) {
     throw new Error(
-      'Unsupported operation. Use add, subtract, multiply, or divide.',
+      'Unsupported operation. Use add, subtract, multiply, divide, modulo, power, or squareRoot.',
     );
   }
 
-  if (operands.length < 2) {
+  if (operands.length < 1) {
+    throw new Error('At least two operands are required.');
+  }
+
+  if (normalizedOperation !== 'squareRoot' && operands.length < 2) {
     throw new Error('At least two operands are required.');
   }
 
@@ -73,13 +105,34 @@ function calculate(operation, operands) {
       }
       return operands[0] / operands[1];
 
+    // Modulo: return the remainder after dividing the first number by the second.
+    case 'modulo':
+      if (operands.length !== 2) {
+        throw new Error('Modulo requires exactly two operands.');
+      }
+      return modulo(operands[0], operands[1]);
+
+    // Exponentiation: raise the first number to the power of the second.
+    case 'power':
+      if (operands.length !== 2) {
+        throw new Error('Power requires exactly two operands.');
+      }
+      return power(operands[0], operands[1]);
+
+    // Square root: calculate the square root of the only operand.
+    case 'squareRoot':
+      if (operands.length !== 1) {
+        throw new Error('Square root requires exactly one operand.');
+      }
+      return squareRoot(operands[0]);
+
     default:
       throw new Error('Unsupported operation.');
   }
 }
 
 function main(args) {
-  if (args.length < 3) {
+  if (args.length < 2) {
     throw new Error(
       'Usage: node src/calculator.js <operation> <number> [number...]',
     );
@@ -98,4 +151,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { calculate, main };
+module.exports = { calculate, main, modulo, power, squareRoot };
